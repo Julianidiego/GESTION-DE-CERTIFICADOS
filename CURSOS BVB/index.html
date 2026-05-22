@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Certificaciones - Bomberos</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Librerías CDN -->
+    <!-- PapaParse para leer el CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <!-- JSZip y FileSaver para empaquetar y descargar PDFs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+<body>
+
+    <!-- Modal de Login (Seguridad disuasoria del lado del cliente) -->
+    <div id="login-overlay">
+        <div class="login-card">
+            <h2>Acceso Restringido</h2>
+            <p>Sistema de Gestión de Certificaciones</p>
+            <input type="password" id="password-input" placeholder="Ingrese su contraseña">
+            <button id="login-btn">Desbloquear</button>
+            <p id="login-error" class="error-text"></p>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal de la App (Oculto por defecto) -->
+    <main id="app-container" class="hidden">
+        <header>
+            <h1>Panel de Certificaciones y Capacitación</h1>
+            <div class="header-actions">
+                <span id="user-badge">Modo Administrador</span>
+            </div>
+        </header>
+
+        <!-- Dashboard de Métricas -->
+        <section id="dashboard" class="cards-grid">
+            <div class="metric-card">
+                <h3>Bombero Destacado (Más Cursos)</h3>
+                <p id="metric-top-bombero">Cargando...</p>
+            </div>
+            <div class="metric-card">
+                <h3>Total Cursos Registrados</h3>
+                <p id="metric-total-cursos">Cargando...</p>
+            </div>
+            <div class="metric-card">
+                <h3>Aspirantes Activos</h3>
+                <p id="metric-aspirantes">Cargando...</p>
+            </div>
+        </section>
+
+        <!-- Panel de Filtros -->
+        <section id="filters-panel">
+            <div class="filter-group text-search">
+                <label for="search-name">Buscar por Nombre/Apellido:</label>
+                <!-- Ej: Buscar "Diego Hernán Juliani" -->
+                <input type="text" id="search-name" placeholder="Ej. Pérez Juan...">
+            </div>
+            <div class="filter-group">
+                <label for="filter-course">Curso:</label>
+                <select id="filter-course">
+                    <option value="">Todos los cursos</option>
+                    <!-- Opciones dinámicas -->
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-eligibility">Condición:</label>
+                <select id="filter-eligibility">
+                    <option value="all">Ignorar</option>
+                    <option value="has">Tiene el curso</option>
+                    <option value="nothas">NO tiene el curso</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-rank">Jerarquía:</label>
+                <select id="filter-rank">
+                    <option value="">Todas</option>
+                    <option value="Bombero">Bombero</option>
+                    <option value="Sargento">Sargento</option>
+                    <option value="Aspirante">Aspirante</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filter-station">Destacamento:</label>
+                <select id="filter-station">
+                    <option value="">Todos</option>
+                    <option value="B">Brandsen (B)</option>
+                    <option value="J">Jeppener (J)</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Tabla de Resultados -->
+        <section id="results-section">
+            <div class="table-header">
+                <h2>Directorio de Personal</h2>
+                <button id="download-zip-btn" class="action-btn" disabled>
+                    Descargar Certificados ZIP
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table id="data-table">
+                    <thead>
+                        <tr id="table-head-row">
+                            <th><input type="checkbox" id="select-all"></th>
+                            <th>Apellido y Nombre</th>
+                            <th>Jerarquía</th>
+                            <th>Destacamento</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Filas dinámicas -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Modal de Perfil Individual -->
+        <div id="profile-modal" class="hidden">
+            <div class="profile-card">
+                <button id="close-profile" class="close-btn">&times;</button>
+                <h2 id="profile-name">Nombre</h2>
+                <p class="profile-subtitle"><span id="profile-rank">Jerarquía</span> - Destacamento: <span id="profile-station">Dest</span></p>
+                <h3>Historial de Cursos</h3>
+                <ul id="profile-courses-list"></ul>
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
